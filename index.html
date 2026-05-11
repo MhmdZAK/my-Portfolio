@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mohammad Sakeer — Mechanical Engineer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:   #0a0a0a;
+      --black2:  #111111;
+      --black3:  #1a1a1a;
+      --gold:    #d4a017;
+      --gold2:   #f0c040;
+      --gold3:   #b8860b;
+      --white:   #f5f0e8;
+      --muted:   #888880;
+      --ff-display: 'Bebas Neue', sans-serif;
+      --ff-body:    'Cormorant Garamond', serif;
+      --ff-mono:    'DM Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: var(--ff-body);
+      font-size: 18px;
+      line-height: 1.7;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── CURSOR ── */
+    .cursor {
+      width: 12px; height: 12px;
+      background: var(--gold);
+      border-radius: 50%;
+      position: fixed;
+      top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s, width 0.2s, height 0.2s, background 0.2s;
+      mix-blend-mode: difference;
+    }
+    .cursor.expand {
+      width: 40px; height: 40px;
+      background: transparent;
+      border: 1.5px solid var(--gold);
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.4;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 24px 60px;
+      background: linear-gradient(to bottom, rgba(10,10,10,0.95), transparent);
+    }
+    .nav-logo {
+      font-family: var(--ff-display);
+      font-size: 22px;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 40px; list-style: none; }
+    .nav-links a {
+      font-family: var(--ff-mono);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: var(--gold2); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 60px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 80% 30%, rgba(212,160,23,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 20% 80%, rgba(212,160,23,0.05) 0%, transparent 60%);
+    }
+
+    .hero-line {
+      position: absolute;
+      top: 0; right: 180px;
+      width: 1px; height: 100vh;
+      background: linear-gradient(to bottom, transparent, var(--gold3), transparent);
+      opacity: 0.3;
+    }
+
+    .hero-tag {
+      font-family: var(--ff-mono);
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeUp 1s 0.3s forwards;
+    }
+
+    .hero-name {
+      font-family: var(--ff-display);
+      font-size: clamp(72px, 12vw, 160px);
+      line-height: 0.9;
+      letter-spacing: 0.02em;
+      color: var(--white);
+      opacity: 0;
+      animation: fadeUp 1s 0.5s forwards;
+    }
+    .hero-name span { color: var(--gold); }
+
+    .hero-bio {
+      font-family: var(--ff-body);
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(18px, 2.5vw, 26px);
+      color: var(--muted);
+      margin-top: 28px;
+      max-width: 600px;
+      opacity: 0;
+      animation: fadeUp 1s 0.7s forwards;
+    }
+
+    .hero-cta {
+      margin-top: 48px;
+      display: flex; align-items: center; gap: 32px;
+      opacity: 0;
+      animation: fadeUp 1s 0.9s forwards;
+    }
+    .btn-gold {
+      display: inline-block;
+      font-family: var(--ff-mono);
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--black);
+      background: var(--gold);
+      padding: 16px 36px;
+      text-decoration: none;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .btn-gold:hover { background: var(--gold2); transform: translateY(-2px); }
+    .btn-outline {
+      display: inline-block;
+      font-family: var(--ff-mono);
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid var(--gold3);
+      padding: 16px 36px;
+      text-decoration: none;
+      transition: border-color 0.3s, color 0.3s;
+    }
+    .btn-outline:hover { border-color: var(--gold2); color: var(--gold2); }
+
+    .scroll-hint {
+      position: absolute; right: 60px; bottom: 80px;
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      opacity: 0;
+      animation: fadeIn 1.5s 1.2s forwards;
+    }
+    .scroll-hint span {
+      font-family: var(--ff-mono);
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      color: var(--muted);
+      writing-mode: vertical-rl;
+      text-transform: uppercase;
+    }
+    .scroll-line {
+      width: 1px; height: 60px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: scrollPulse 2s 1.5s infinite;
+    }
+
+    /* ── SECTION SHARED ── */
+    section { position: relative; padding: 120px 60px; }
+    .section-label {
+      font-family: var(--ff-mono);
+      font-size: 10px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1; max-width: 60px;
+      height: 1px;
+      background: var(--gold3);
+    }
+    .section-title {
+      font-family: var(--ff-display);
+      font-size: clamp(44px, 7vw, 88px);
+      line-height: 1;
+      letter-spacing: 0.03em;
+      color: var(--white);
+      margin-bottom: 64px;
+    }
+    .section-title em { color: var(--gold); font-style: normal; }
+
+    /* ── ABOUT ── */
+    #about { background: var(--black2); }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+    .about-text p {
+      font-size: clamp(16px, 1.8vw, 20px);
+      font-weight: 300;
+      color: #ccc8bc;
+      margin-bottom: 24px;
+    }
+    .about-text p strong { color: var(--gold); font-weight: 600; }
+    .about-pillars {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 48px;
+    }
+    .pillar {
+      border: 1px solid var(--black3);
+      padding: 28px 24px;
+      border-left: 2px solid var(--gold3);
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .pillar:hover { border-color: var(--gold); transform: translateY(-4px); }
+    .pillar-icon {
+      font-size: 28px;
+      margin-bottom: 12px;
+    }
+    .pillar-title {
+      font-family: var(--ff-display);
+      font-size: 22px;
+      letter-spacing: 0.08em;
+      color: var(--gold2);
+      margin-bottom: 8px;
+    }
+    .pillar-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .about-stats {
+      display: flex; flex-direction: column; gap: 40px;
+    }
+    .stat-item { border-bottom: 1px solid var(--black3); padding-bottom: 40px; }
+    .stat-number {
+      font-family: var(--ff-display);
+      font-size: 80px;
+      line-height: 1;
+      color: var(--gold);
+      letter-spacing: 0.02em;
+    }
+    .stat-label {
+      font-family: var(--ff-mono);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    /* ── SKILLS ── */
+    #skills { background: var(--black); }
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+    .skill-card {
+      background: var(--black2);
+      padding: 40px 32px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+    .skill-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 2px;
+      background: var(--gold);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s;
+    }
+    .skill-card:hover { background: var(--black3); }
+    .skill-card:hover::before { transform: scaleX(1); }
+    .skill-num {
+      font-family: var(--ff-display);
+      font-size: 56px;
+      color: var(--black3);
+      position: absolute;
+      top: 16px; right: 24px;
+      line-height: 1;
+      transition: color 0.3s;
+    }
+    .skill-card:hover .skill-num { color: rgba(212,160,23,0.1); }
+    .skill-name {
+      font-family: var(--ff-display);
+      font-size: 24px;
+      letter-spacing: 0.06em;
+      color: var(--white);
+      margin-bottom: 12px;
+    }
+    .skill-bar-wrap {
+      height: 2px;
+      background: var(--black3);
+      margin-bottom: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+    .skill-bar {
+      height: 100%;
+      background: linear-gradient(to right, var(--gold3), var(--gold2));
+      transform-origin: left;
+      transform: scaleX(0);
+      transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .skill-card.visible .skill-bar { transform: scaleX(1); }
+    .skill-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    /* ── EXPERIENCE ── */
+    #experience { background: var(--black2); }
+    .exp-timeline { position: relative; max-width: 800px; }
+    .exp-timeline::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--gold3), transparent);
+    }
+    .exp-item {
+      padding: 0 0 64px 48px;
+      position: relative;
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: opacity 0.6s, transform 0.6s;
+    }
+    .exp-item.visible { opacity: 1; transform: translateX(0); }
+    .exp-dot {
+      position: absolute;
+      left: -5px; top: 8px;
+      width: 11px; height: 11px;
+      background: var(--gold);
+      border-radius: 50%;
+      border: 2px solid var(--black2);
+    }
+    .exp-period {
+      font-family: var(--ff-mono);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .exp-role {
+      font-family: var(--ff-display);
+      font-size: 32px;
+      letter-spacing: 0.05em;
+      color: var(--white);
+      margin-bottom: 4px;
+    }
+    .exp-company {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+    .exp-desc {
+      font-size: 16px;
+      font-weight: 300;
+      color: #bbb;
+      max-width: 600px;
+    }
+
+    /* ── PROJECTS ── */
+    #projects { background: var(--black); }
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2px;
+    }
+    .project-card {
+      background: var(--black2);
+      padding: 48px 40px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.4s, background 0.3s;
+    }
+    .project-card:hover { transform: translateY(-4px); background: var(--black3); }
+    .project-card.featured {
+      grid-column: span 2;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+    .project-card::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0;
+      height: 2px; width: 0;
+      background: var(--gold);
+      transition: width 0.4s;
+    }
+    .project-card:hover::after { width: 100%; }
+    .project-tag {
+      font-family: var(--ff-mono);
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+    .project-title {
+      font-family: var(--ff-display);
+      font-size: 36px;
+      letter-spacing: 0.04em;
+      color: var(--white);
+      margin-bottom: 16px;
+      line-height: 1.1;
+    }
+    .project-desc {
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .project-visual {
+      height: 200px;
+      background: linear-gradient(135deg, rgba(212,160,23,0.1), rgba(212,160,23,0.03));
+      border: 1px solid rgba(212,160,23,0.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 64px;
+    }
+    .project-links {
+      margin-top: 24px;
+      display: flex; gap: 20px;
+    }
+    .project-link {
+      font-family: var(--ff-mono);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-decoration: none;
+      display: flex; align-items: center; gap: 8px;
+      transition: color 0.3s;
+    }
+    .project-link:hover { color: var(--gold2); }
+    .project-link::after { content: '→'; }
+
+    /* ── CONTACT ── */
+    #contact {
+      background: var(--black2);
+      text-align: center;
+    }
+    .contact-inner { max-width: 700px; margin: 0 auto; }
+    .contact-intro {
+      font-size: clamp(16px, 2vw, 20px);
+      font-style: italic;
+      font-weight: 300;
+      color: var(--muted);
+      margin-bottom: 48px;
+    }
+    .contact-email {
+      font-family: var(--ff-display);
+      font-size: clamp(32px, 5vw, 64px);
+      color: var(--white);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      display: block;
+      margin-bottom: 48px;
+      transition: color 0.3s;
+    }
+    .contact-email:hover { color: var(--gold); }
+    .social-links {
+      display: flex; justify-content: center; gap: 32px;
+      flex-wrap: wrap;
+    }
+    .social-link {
+      display: flex; align-items: center; gap: 10px;
+      font-family: var(--ff-mono);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--black3);
+      padding: 14px 24px;
+      transition: color 0.3s, border-color 0.3s;
+    }
+    .social-link:hover { color: var(--gold); border-color: var(--gold3); }
+    .social-link svg { width: 16px; height: 16px; fill: currentColor; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--black);
+      padding: 40px 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-top: 1px solid var(--black3);
+    }
+    .footer-name {
+      font-family: var(--ff-display);
+      font-size: 18px;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+    }
+    .footer-copy {
+      font-family: var(--ff-mono);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
+    /* ── DIVIDER ── */
+    .gold-divider {
+      width: 60px; height: 2px;
+      background: var(--gold);
+      margin-bottom: 64px;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s, transform 0.8s;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      nav { padding: 20px 24px; }
+      .nav-links { display: none; }
+      section { padding: 80px 24px; }
+      #hero { padding: 0 24px 60px; }
+      .about-grid { grid-template-columns: 1fr; gap: 48px; }
+      .skills-grid { grid-template-columns: 1fr 1fr; }
+      .projects-grid { grid-template-columns: 1fr; }
+      .project-card.featured { grid-column: span 1; grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 16px; text-align: center; }
+    }
+    @media (max-width: 600px) {
+      .skills-grid { grid-template-columns: 1fr; }
+      .about-pillars { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Custom Cursor -->
+  <div class="cursor" id="cursor"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#hero" class="nav-logo">MS</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-line"></div>
+    <div class="hero-tag">Mechanical Engineer · Mentor · Coach</div>
+    <h1 class="hero-name">
+      Mohammad<br /><span>Sakeer</span>
+    </h1>
+    <p class="hero-bio">
+      Engineering precision meets human impact — building, teaching, and empowering people to level up.
+    </p>
+    <div class="hero-cta">
+      <a href="#projects" class="btn-gold">View My Work</a>
+      <a href="#contact" class="btn-outline">Get In Touch</a>
+    </div>
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="section-label">01 — About</div>
+    <h2 class="section-title">Who I <em>Am</em></h2>
+    <div class="about-grid">
+      <div class="about-text">
+        <p>
+          I'm <strong>Mohammad Sakeer</strong>, a mechanical engineer with a passion for
+          precision — in machines, in learning, and in life. My work spans the technical
+          world of engineering and the deeply human world of coaching and mentorship.
+        </p>
+        <p>
+          I believe that <strong>growth is a system</strong> — one that can be designed,
+          refined, and optimised. Whether I'm analysing stress loads or helping someone
+          break through their ceiling, the principles are the same: clarity, discipline,
+          and relentless improvement.
+        </p>
+        <p>
+          Beyond the blueprint and the whiteboard, you'll find me on the football pitch
+          — where I study teamwork, resilience, and the beautiful geometry of the game.
+        </p>
+        <div class="about-pillars">
+          <div class="pillar">
+            <div class="pillar-icon">⚙️</div>
+            <div class="pillar-title">Engineering</div>
+            <div class="pillar-desc">Mechanical systems, design thinking, and technical problem-solving.</div>
+          </div>
+          <div class="pillar">
+            <div class="pillar-icon">📖</div>
+            <div class="pillar-title">Teaching</div>
+            <div class="pillar-desc">Helping others unlock knowledge and build lasting skills.</div>
+          </div>
+          <div class="pillar">
+            <div class="pillar-icon">🚀</div>
+            <div class="pillar-title">Growth</div>
+            <div class="pillar-desc">Coaching people to break limits and reach their next level.</div>
+          </div>
+          <div class="pillar">
+            <div class="pillar-icon">⚽</div>
+            <div class="pillar-title">Football</div>
+            <div class="pillar-desc">Strategy, teamwork, and the pursuit of excellence on the pitch.</div>
+          </div>
+        </div>
+      </div>
+      <div class="about-stats">
+        <div class="stat-item reveal">
+          <div class="stat-number">∞</div>
+          <div class="stat-label">Passion for growth &amp; learning</div>
+        </div>
+        <div class="stat-item reveal">
+          <div class="stat-number">3</div>
+          <div class="stat-label">Core disciplines mastered</div>
+        </div>
+        <div class="stat-item reveal">
+          <div class="stat-number">1</div>
+          <div class="stat-label">Mission — to help people level up</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="section-label">02 — Skills</div>
+    <h2 class="section-title">What I <em>Do</em></h2>
+    <div class="skills-grid">
+      <div class="skill-card">
+        <div class="skill-num">01</div>
+        <div class="skill-name">Mechanical Design</div>
+        <div class="skill-bar-wrap"><div class="skill-bar" style="--w:0.9"></div></div>
+        <div class="skill-desc">CAD modelling, structural analysis, and systems engineering from concept to prototype.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-num">02</div>
+        <div class="skill-name">Problem Solving</div>
+        <div class="skill-bar-wrap"><div class="skill-bar" style="--w:0.95"></div></div>
+        <div class="skill-desc">Breaking down complex challenges into elegant, efficient solutions.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-num">03</div>
+        <div class="skill-name">Teaching &amp; Mentorship</div>
+        <div class="skill-bar-wrap"><div class="skill-bar" style="--w:0.92"></div></div>
+        <div class="skill-desc">Guiding students and individuals through reading, learning, and personal development.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-num">04</div>
+        <div class="skill-name">Coaching &amp; Growth</div>
+        <div class="skill-bar-wrap"><div class="skill-bar" style="--w:0.88"></div></div>
+        <div class="skill-desc">Helping people identify their potential and build systems to achieve it consistently.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-num">05</div>
+        <div class="skill-name">Football &amp; Strategy</div>
+        <div class="skill-bar-wrap"><div class="skill-bar" style="--w:0.85"></div></div>
+        <div class="skill-desc">Tactical analysis, team coordination, and applying sport intelligence to life.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-num">06</div>
+        <div class="skill-name">Communication</div>
+        <div class="skill-bar-wrap"><div class="skill-bar" style="--w:0.9"></div></div>
+        <div class="skill-desc">Translating technical complexity into clear, compelling, and actionable language.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <div class="section-label">03 — Experience</div>
+    <h2 class="section-title">My <em>Journey</em></h2>
+    <div class="exp-timeline">
+      <div class="exp-item reveal">
+        <div class="exp-dot"></div>
+        <div class="exp-period">Present</div>
+        <div class="exp-role">Growth Coach & Mentor</div>
+        <div class="exp-company">Independent Practice</div>
+        <div class="exp-desc">Helping individuals break through personal and professional ceilings. Providing structured coaching frameworks, reading guidance, and accountability systems for lasting transformation.</div>
+      </div>
+      <div class="exp-item reveal">
+        <div class="exp-dot"></div>
+        <div class="exp-period">Ongoing</div>
+        <div class="exp-role">Mechanical Engineer</div>
+        <div class="exp-company">Engineering Practice</div>
+        <div class="exp-desc">Applying mechanical principles to real-world problems — from design and analysis to implementation. Bridging technical rigour with creative innovation.</div>
+      </div>
+      <div class="exp-item reveal">
+        <div class="exp-dot"></div>
+        <div class="exp-period">Lifelong</div>
+        <div class="exp-role">Teacher & Reading Advocate</div>
+        <div class="exp-company">Community & Education</div>
+        <div class="exp-desc">Dedicated to helping people discover the power of reading and continuous learning. Building literacy and curiosity as foundations for a better life.</div>
+      </div>
+      <div class="exp-item reveal">
+        <div class="exp-dot"></div>
+        <div class="exp-period">Always</div>
+        <div class="exp-role">Footballer & Student of the Game</div>
+        <div class="exp-company">The Beautiful Game</div>
+        <div class="exp-desc">A deep love for football — its strategy, its discipline, and its lessons about teamwork, resilience, and performing under pressure.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="section-label">04 — Projects</div>
+    <h2 class="section-title">Featured <em>Work</em></h2>
+    <div class="projects-grid">
+      <div class="project-card featured reveal">
+        <div>
+          <div class="project-tag">Growth · Coaching</div>
+          <div class="project-title">Level Up Framework</div>
+          <div class="project-desc">
+            A personal development system built to help people engineer their own growth. Drawing from mechanical systems thinking, this framework maps goals, identifies bottlenecks, and creates a repeatable process for continuous improvement.
+          </div>
+          <div class="project-links">
+            <a href="#contact" class="project-link">Learn More</a>
+          </div>
+        </div>
+        <div class="project-visual">🚀</div>
+      </div>
+      <div class="project-card reveal">
+        <div class="project-tag">Education · Reading</div>
+        <div class="project-title">Reading for Growth Programme</div>
+        <div class="project-desc">
+          A structured reading curriculum designed to build knowledge, vocabulary, and critical thinking in learners of all levels.
+        </div>
+        <div class="project-links">
+          <a href="#contact" class="project-link">Enquire</a>
+        </div>
+      </div>
+      <div class="project-card reveal">
+        <div class="project-tag">Engineering · Design</div>
+        <div class="project-title">Mechanical Engineering Projects</div>
+        <div class="project-desc">
+          Applied engineering work combining precision design, structural analysis, and real-world problem solving in mechanical systems.
+        </div>
+        <div class="project-links">
+          <a href="#contact" class="project-link">See More</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="contact-inner">
+      <div class="section-label" style="justify-content:center">05 — Contact</div>
+      <h2 class="section-title" style="margin-bottom:24px">Let's <em>Connect</em></h2>
+      <p class="contact-intro">
+        Whether you want to collaborate, need coaching, or just want to talk — I'm one message away.
+      </p>
+      <div class="gold-divider" style="margin: 0 auto 48px;"></div>
+      <div class="social-links">
+        <a href="https://www.instagram.com/mhmd_zak_?igsh=dG5jenNxdDV5OHB6" target="_blank" rel="noopener" class="social-link">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          Instagram
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span class="footer-name">Mohammad Sakeer</span>
+    <span class="footer-copy">© 2025 — Engineered with purpose.</span>
+  </footer>
+
+  <script>
+    // Custom cursor
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top  = e.clientY + 'px';
+    });
+    document.querySelectorAll('a, button, .pillar, .skill-card, .project-card').forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('expand'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('expand'));
+    });
+
+    // Intersection observer for reveal + skill bars
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          // animate skill bars
+          e.target.querySelectorAll && e.target.querySelectorAll('.skill-bar').forEach(bar => {
+            bar.style.transform = `scaleX(${bar.parentElement.parentElement.querySelector ? 1 : 1})`;
+          });
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.reveal, .skill-card, .exp-item').forEach(el => io.observe(el));
+
+    // Skill bars width from CSS var
+    document.querySelectorAll('.skill-bar').forEach(bar => {
+      const card = bar.closest('.skill-card');
+      card && io.observe(card);
+    });
+
+    // Active nav link
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-links a');
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(s => {
+        if (window.scrollY >= s.offsetTop - 100) current = s.id;
+      });
+      navLinks.forEach(a => {
+        a.style.color = a.getAttribute('href') === '#' + current ? 'var(--gold2)' : '';
+      });
+    });
+  </script>
+</body>
+</html>
